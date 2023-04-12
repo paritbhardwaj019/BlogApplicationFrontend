@@ -11,6 +11,7 @@ import {
   CreatePost,
   AllCategories,
   UpdateCategory,
+  Profile,
 } from "./components";
 import { useSelector } from "react-redux";
 
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/create-post" Component={CreatePost} />
         <Route path="/category-list" Component={AllCategories} />
         <Route path="/update-category/:id" Component={UpdateCategory} />
+        <Route path="/profile" Component={Profile} />
         <Route path="/*" Component={NotFound} />
       </Routes>
     </>
