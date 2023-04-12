@@ -18,3 +18,6 @@ export { default as UpdateCategory } from "./Categories/UpdateCategory";
 
 // Posts
 export { default as CreatePost } from "./Posts/CreatePost";
+
+// Profile
+export { default as Profile } from "./Profile";

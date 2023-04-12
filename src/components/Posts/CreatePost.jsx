@@ -1,9 +1,31 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { createPostAction } from "../../redux/slice/posts/postSlices";
+import CategorySelect from "../Categories/CategorySelect";
+
+const formSchema = Yup.object({
+  title: Yup.string().required("Title is required"),
+  description: Yup.string().required("Description is required"),
+});
 
 export default function CreatePost() {
+  const dispatch = useDispatch();
   const store = useSelector((store) => store.users);
   const { user } = store;
+
+  const formik = useFormik({
+    initialValues: {
+      title: "",
+      description: "",
+    },
+    onSubmit: (values) => {
+      console.log(values);
+      dispatch(createPostAction(values));
+    },
+    validationSchema: formSchema,
+  });
 
   const isAdmin = user?.data?.user?.isAdmin;
 
@@ -50,14 +72,13 @@ export default function CreatePost() {
 
           <p className="mt-2 text-center text-sm text-gray-600">
             <p className="font-medium text-green-600 hover:text-indigo-500">
-              Share your ideas to the word. Your post must be free from
-              profanity
+              Share your ideas to the word.
             </p>
           </p>
         </div>
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={formik.handleSubmit}>
               <div>
                 <label
                   htmlFor="email"
@@ -68,6 +89,9 @@ export default function CreatePost() {
                 <div className="mt-1">
                   {/* Title */}
                   <input
+                    value={formik.values.title}
+                    onChange={formik.handleChange("title")}
+                    onBlur={formik.handleBlur("title")}
                     id="title"
                     name="title"
                     type="title"
@@ -77,10 +101,11 @@ export default function CreatePost() {
                 </div>
                 {/* Err msg */}
                 <div className="text-red-500">
-                  {/* {formik.touched.title && formik.errors.title} */}Err here
+                  {formik.touched.title && formik.errors.title}
                 </div>
               </div>
-              Category input goes here
+              {/* Category input goes here */}
+              <CategorySelect />
               <div>
                 <label
                   htmlFor="password"
@@ -90,13 +115,18 @@ export default function CreatePost() {
                 </label>
                 {/* Description */}
                 <textarea
+                  value={formik.values.description}
+                  onChange={formik.handleChange("description")}
+                  onBlur={formik.handleBlur("description")}
                   rows="5"
                   cols="10"
                   className="rounded-lg appearance-none block w-full py-3 px-3 text-base text-center leading-tight text-gray-600 bg-transparent focus:bg-transparent  border border-gray-200 focus:border-gray-500  focus:outline-none"
                   type="text"
                 ></textarea>
                 {/* Err msg */}
-                <div className="text-red-500">Err here</div>
+                <div className="text-red-500">
+                  {formik.touched.description && formik.errors.description}
+                </div>
               </div>
               <div>
                 {/* Submit btn */}
