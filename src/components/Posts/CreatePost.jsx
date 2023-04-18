@@ -1,14 +1,34 @@
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { createPostAction } from "../../redux/slice/posts/postSlices";
-import CategorySelect from "../Categories/CategorySelect";
+import Dropzone from 'react-dropzone';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { createPostAction } from '../../redux/slice/posts/postSlices';
+import CategorySelect from '../Categories/CategorySelect';
+import styled from 'styled-components';
 
 const formSchema = Yup.object({
-  title: Yup.string().required("Title is required"),
-  description: Yup.string().required("Description is required"),
+  title: Yup.string().required('Title is required'),
+  description: Yup.string().required('Description is required'),
+  image: Yup.string().required('Image is required'),
 });
+
+const Container = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-width: 2px;
+  border-radius: 2px;
+  border-style: solid;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  outline: none;
+  transition: border 0.24s ease-in-out;
+  margin-top: 20px;
+  border-radius: 12px;
+`;
 
 export default function CreatePost() {
   const dispatch = useDispatch();
@@ -17,12 +37,20 @@ export default function CreatePost() {
 
   const formik = useFormik({
     initialValues: {
-      title: "",
-      description: "",
+      title: '',
+      description: '',
+      category: '',
+      image: '',
     },
     onSubmit: (values) => {
+      const data = {
+        category: values.category.label,
+        title: values.title,
+        description: values.description,
+        image: values.image,
+      };
+      dispatch(createPostAction(data));
       console.log(values);
-      dispatch(createPostAction(values));
     },
     validationSchema: formSchema,
   });
@@ -52,7 +80,7 @@ export default function CreatePost() {
         </div>
         <div className="absolute bottom-0 mb-4 text-gray-500">
           <p>
-            Illustration by{" "}
+            Illustration by{' '}
             <a href="https://icons8.com/illustrations/author/5c461f80b0655d0017e00e27">
               Ouch.pics
             </a>
@@ -90,8 +118,8 @@ export default function CreatePost() {
                   {/* Title */}
                   <input
                     value={formik.values.title}
-                    onChange={formik.handleChange("title")}
-                    onBlur={formik.handleBlur("title")}
+                    onChange={formik.handleChange('title')}
+                    onBlur={formik.handleBlur('title')}
                     id="title"
                     name="title"
                     type="title"
@@ -105,7 +133,12 @@ export default function CreatePost() {
                 </div>
               </div>
               {/* Category input goes here */}
-              <CategorySelect />
+              <CategorySelect
+                value={formik.values}
+                onChange={formik.setFieldValue}
+                onBlur={formik.setFieldTouched}
+                touched={formik.touched.category}
+              />
               <div>
                 <label
                   htmlFor="password"
@@ -116,8 +149,8 @@ export default function CreatePost() {
                 {/* Description */}
                 <textarea
                   value={formik.values.description}
-                  onChange={formik.handleChange("description")}
-                  onBlur={formik.handleBlur("description")}
+                  onChange={formik.handleChange('description')}
+                  onBlur={formik.handleBlur('description')}
                   rows="5"
                   cols="10"
                   className="rounded-lg appearance-none block w-full py-3 px-3 text-base text-center leading-tight text-gray-600 bg-transparent focus:bg-transparent  border border-gray-200 focus:border-gray-500  focus:outline-none"
@@ -127,6 +160,36 @@ export default function CreatePost() {
                 <div className="text-red-500">
                   {formik.touched.description && formik.errors.description}
                 </div>
+                {/* Image Component */}
+                <Container className="container border-none bg-slate-300 hover:bg-slate-500 transition ease-out duration-200 cursor-pointer ">
+                  <Dropzone
+                    accept="image/jpeg, image/png"
+                    onDrop={(acceptedFiles) => {
+                      formik.setFieldValue('image', acceptedFiles[0]);
+                    }}
+                    onBlur={formik.handleBlur('image')}
+                  >
+                    {({ getRootProps, getInputProps }) => {
+                      return (
+                        <div className="container">
+                          <div
+                            {...getRootProps({
+                              className: 'dropzone',
+                              onDrop: (event) => {
+                                event.stopPropagation();
+                              },
+                            })}
+                          >
+                            {/* <input  /> */}
+                            <p className="text-gray" {...getInputProps}>
+                              Click Here to Select Image
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }}
+                  </Dropzone>
+                </Container>
               </div>
               <div>
                 {/* Submit btn */}
