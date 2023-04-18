@@ -1,19 +1,33 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { BASE_URL } from "../../../utils";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { BASE_URL } from '../../../utils';
 
 export const createPostAction = createAsyncThunk(
-  "post/create",
+  'post/create',
   async (post, { rejectWithValue, dispatch, getState }) => {
     const userToken = getState()?.users?.user?.data?.user?.token;
     try {
+      console.log('post', post);
       const config = {
         headers: {
-          "Conten-type": "application/json",
+          'Conten-type': 'application/json',
           Authorization: `Bearer ${userToken}`,
         },
       };
-      const { data } = axios.post(`${BASE_URL}/api/v1/post`, post, config);
+      const formData = new FormData();
+      formData.append('title', post.title);
+      formData.append('description', post.description);
+      formData.append('category', post.category);
+      formData.append('title', post.title);
+      formData.append('image', post?.image);
+
+      const { data } = axios.post(
+        `${BASE_URL}/api/v1/post`,
+        {
+          data: formData,
+        },
+        config
+      );
       return data;
     } catch (error) {
       if (!error?.response) {
@@ -25,7 +39,7 @@ export const createPostAction = createAsyncThunk(
 );
 
 const postSlice = createSlice({
-  name: "postSlice",
+  name: 'postSlice',
   initialState: {},
   extraReducers: (builder) => {
     builder.addCase(createPostAction.pending, (state, action) => {
