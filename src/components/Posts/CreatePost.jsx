@@ -1,6 +1,6 @@
 import Dropzone from 'react-dropzone';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { createPostAction } from '../../redux/slice/posts/postSlices';
@@ -33,7 +33,10 @@ const Container = styled.div`
 export default function CreatePost() {
   const dispatch = useDispatch();
   const store = useSelector((store) => store.users);
+  const post = useSelector((store) => store.posts);
   const { user } = store;
+
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -50,12 +53,19 @@ export default function CreatePost() {
         image: values.image,
       };
       dispatch(createPostAction(data));
-      console.log(values);
     },
     validationSchema: formSchema,
   });
 
   const isAdmin = user?.data?.user?.isAdmin;
+
+  const postsStore = useSelector((state) => state.posts);
+
+  const { loading, appError, serverError } = postsStore;
+
+  if (post?.isCreated) {
+    return <Navigate to={'/posts'} />;
+  }
 
   if (!user?.data?.user) {
     return (
@@ -102,6 +112,12 @@ export default function CreatePost() {
             <p className="font-medium text-green-600 hover:text-indigo-500">
               Share your ideas to the word.
             </p>
+            {appError ||
+              (serverError && (
+                <p className="font-medium text-red-600 hover:text-indigo-500" s>
+                  {serverError} {appError}
+                </p>
+              ))}
           </p>
         </div>
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -193,12 +209,21 @@ export default function CreatePost() {
               </div>
               <div>
                 {/* Submit btn */}
-                <button
-                  type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Create
-                </button>
+                {loading ? (
+                  <button
+                    type="submit"
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Loading...
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Create
+                  </button>
+                )}
               </div>
             </form>
           </div>
