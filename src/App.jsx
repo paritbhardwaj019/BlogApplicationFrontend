@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from 'react-router-dom';
 import {
   HomePage,
   PublicNavbar,
@@ -12,8 +12,9 @@ import {
   AllCategories,
   UpdateCategory,
   Profile,
-} from "./components";
-import { useSelector } from "react-redux";
+  AllPosts,
+} from './components';
+import { useSelector } from 'react-redux';
 
 export default function App() {
   const store = useSelector((store) => store.users);
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/login" Component={Login} />
         <Route path="/add-category" Component={CreateCategory} />
         <Route path="/create-post" Component={CreatePost} />
+        <Route path="/posts" Component={AllPosts} />
         <Route path="/category-list" Component={AllCategories} />
         <Route path="/update-category/:id" Component={UpdateCategory} />
         <Route path="/profile" Component={Profile} />
